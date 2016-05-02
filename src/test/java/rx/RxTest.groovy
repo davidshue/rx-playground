@@ -41,5 +41,37 @@ class RxTest {
 	}
 
 	@Test
-	void testEmpty
+	void testDefer() {
+		Observable.defer{Observable.from(1..100)}
+			.subscribe(
+			{println 'next ' + it},
+			{println 'error ' + it},
+			{println 'complete '}
+		)
+	}
+
+	@Test
+	void testEmptyErrorNever() {
+		println '*** empty() ***'
+		Observable.empty().subscribe(
+			{ println "empty: $it" },                      // onNext
+			{ println "empty: error - $it.message" }, // onError
+			{ println "empty: Sequence complete" }           // onCompleted
+		)
+
+		println "*** error() ***"
+		Observable.error(new Throwable("badness")).subscribe(
+			{ println "error: $it" },                      // onNext
+			{ println "error: error - $it.message" }, // onError
+			{ println "error: Sequence complete" }           // onCompleted
+		);
+
+		println "*** never() ***"
+		Observable.never().subscribe(
+			{ println "never: $it" },                      // onNext
+			{ println "never: error - $it.message" }, // onError
+			{ println "never: Sequence complete" }           // onCompleted
+		);
+		println "*** END ***"
+	}
 }
