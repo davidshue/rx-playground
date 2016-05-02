@@ -38,11 +38,30 @@ class RxTest {
 			}
 		}
 		.subscribe{println it}
+
+		Observable.from(1..3)
+			.flatMap{n -> Observable.from([n*2, n* 3])}
+			.subscribe(
+				{println 'next ' + it},
+				{println 'error ' + it},
+				{println 'complete '}
+			)
 	}
 
 	@Test
 	void testDefer() {
 		Observable.defer{Observable.from(1..100)}
+			.subscribe(
+			{println 'next ' + it},
+			{println 'error ' + it},
+			{println 'complete '}
+		)
+	}
+
+	@Test
+	void testRange() {
+		Observable.range(10, 10)
+			.buffer(3)
 			.subscribe(
 			{println 'next ' + it},
 			{println 'error ' + it},
