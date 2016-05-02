@@ -49,6 +49,21 @@ class RxTest {
 	}
 
 	@Test
+	void testGroupBy() {
+		def persons = [new Person(gender: Gender.MALE, name: 'John', age: 50), new Person(gender: Gender.FEMALE, name: 'debbie', age: 20),
+		               new Person(gender: Gender.MALE, name: 'billy', age: 30), new Person(gender: Gender.MALE, name: 'alex', age: 40)
+		]
+		Observable.from(persons)
+			.map { Person it -> it.age }
+			.reduce{x, y -> x + y}
+			.subscribe (
+				{println 'next ' + it},
+				{println 'error ' + it},
+				{println 'complete '}
+			)
+	}
+
+	@Test
 	void testDefer() {
 		Observable.defer{Observable.from(1..100)}
 			.subscribe(
@@ -92,5 +107,18 @@ class RxTest {
 			{ println "never: Sequence complete" }           // onCompleted
 		);
 		println "*** END ***"
+	}
+
+	@Test
+	void testFibonacci() {
+		Observable.from(1..10)
+		.reduce([1,1]){x,y->
+			x << x[y] + x[y-1]
+		}
+		.subscribe(
+			{ println "next: $it" },                      // onNext
+			{ println "error - $it.message" }, // onError
+			{ println "Sequence complete" }           // onCompleted
+		);
 	}
 }
