@@ -69,6 +69,62 @@ class RxCollectionTest {
 		println 'Took ' + (end-start) + ' ms'
 	}
 
+	@Test
+	void testFlatMapExampleSync() {
+		long start = System.currentTimeMillis()
+		Observable
+			.range(0, 5)
+			.flatMap{i -> getDataSync(i)}
+			.toBlocking()
+			.forEach{println it}
+
+		long end = System.currentTimeMillis()
+
+		println 'Took ' + (end-start) + ' ms'
+	}
+
+	@Test
+	void testFlatMapBufferedExampleAsync() {
+		long start = System.currentTimeMillis()
+		Observable
+			.range(0, 5000)
+			.buffer(500)
+			.flatMap{i ->
+				Observable.from(i).subscribeOn(Schedulers.computation()).map{item ->
+					// simulate computational work
+					sleep 1
+					item + " processed " + Thread.currentThread()
+				}
+			}
+			.toBlocking()
+			.forEach{println it}
+
+		long end = System.currentTimeMillis()
+
+		println 'Took ' + (end-start) + ' ms'
+	}
+
+	@Test
+	void testFlatMapWindowedExampleAsync() {
+		long start = System.currentTimeMillis()
+		Observable
+			.range(0, 5000)
+			.window(500)
+			.flatMap{work ->
+				work.observeOn(Schedulers.computation()).map{item ->
+					// simulate computational work
+					sleep 1
+
+					item + " processed " + Thread.currentThread()
+				}
+			}
+			.toBlocking()
+			.forEach{println it}
+
+		long end = System.currentTimeMillis()
+
+		println 'Took ' + (end-start) + ' ms'
+	}
 
 
 	Observable<Integer> getDataAsync(int i) {
