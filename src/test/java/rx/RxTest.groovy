@@ -53,7 +53,8 @@ class RxTest {
 		def persons = [new Person(gender: Gender.MALE, name: 'John', age: 50), new Person(gender: Gender.FEMALE, name: 'debbie', age: 20),
 		               new Person(gender: Gender.MALE, name: 'billy', age: 30), new Person(gender: Gender.MALE, name: 'alex', age: 40)
 		]
-		Observable.from(persons)
+		Observable
+			.from(persons)
 			.map { Person it -> it.age }
 			.reduce{x, y -> x + y}
 			.subscribe (
@@ -61,6 +62,15 @@ class RxTest {
 				{println 'error ' + it},
 				{println 'complete '}
 			)
+
+		Observable
+			.from(persons)
+			//.groupBy{Person p -> p.gender}
+			//.reduce([:]){x,y->x[y.gender] = x.get(y.gender, 0) + 1; x}
+			.count()
+			.subscribe{
+				println it
+			}
 	}
 
 	@Test
@@ -79,6 +89,23 @@ class RxTest {
 			.buffer(3)
 			.subscribe(
 			{println 'next ' + it},
+			{println 'error ' + it},
+			{println 'complete '}
+		)
+	}
+
+	@Test
+	void testWindow() {
+		Observable.from(1..10)
+			.window(3)
+			.subscribe(
+			{
+				it.subscribe(
+					{println 'next ' + it},
+					{println 'error ' + it},
+					{println 'complete '}
+				)
+			},
 			{println 'error ' + it},
 			{println 'complete '}
 		)
